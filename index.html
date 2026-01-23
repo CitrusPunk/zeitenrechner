@@ -1,19 +1,21 @@
 <!DOCTYPE html>
 <html lang="de">
+
 <head>
   <meta charset="UTF-8">
   <title>Zeitrechner</title>
   <link rel="stylesheet" href="style.css">
-  <script type="text/javascript" src="script.js"></script>
 </head>
+
 <body>
   <h1>Zeitrechner</h1>
- 
+
   <div class="info-top">
-    ⚠️ Ab mehr als <strong>6:00h Anwesenheit</strong> wird gesetzlich eine <strong>Pause von 0:30h</strong> abgezogen.<br>
+    ⚠️ Ab mehr als <strong>6:00h Anwesenheit</strong> wird gesetzlich eine <strong>Pause von 0:30h</strong>
+    abgezogen.<br>
     Normale Arbeitszeit: <strong>8:00h Anwesenheit</strong> (= 7:30h Netto)
   </div>
- 
+
   <div class="section">
     <div style="margin-bottom: 1rem;">
       <label for="arbeitsbeginn">Beginn:</label>
@@ -22,7 +24,7 @@
       <input type="time" id="arbeitsende">
       <button onclick="berechneEndzeiten()">Berechne</button>
     </div>
- 
+
     <div class="output-field">
       <label>Normales Arbeitsende</label>
       <div class="output-box">
@@ -30,15 +32,16 @@
         <div class="output-info">Ende nach 8:00h Anwesenheit (inkl. 0:30h Pause)</div>
       </div>
     </div>
- 
+
     <div class="output-field">
       <label>Max. Arbeitsende</label>
       <div class="output-box">
         <div class="output-value" id="ueberstundenEnde">--:--</div>
-        <div class="output-info">Spätestes Ende bei 9:30h Anwesenheit (9:00h netto) – jedoch nie später als 17:00 Uhr</div>
+        <div class="output-info">Spätestes Ende bei 9:30h Anwesenheit (9:00h netto) – jedoch nie später als 17:00 Uhr
+        </div>
       </div>
     </div>
- 
+
     <div class="output-field">
       <label>Letzter Zeitpunkt ohne Pausepflicht</label>
       <div class="output-box">
@@ -46,19 +49,21 @@
         <div class="output-info">Gehe vor diesem Zeitpunkt, um keine 0:30h Pause zu riskieren (nach 6:00h)</div>
       </div>
     </div>
- 
+
     <div class="defizit-box minus" id="fehlzeitBox">
       <div class="output-value" id="fehlzeitWert">--:--</div>
       <div class="output-info">❌ Zu wenig gearbeitet</div>
     </div>
- 
+
     <div class="defizit-box plus" id="pluszeitBox">
       <div class="output-value" id="pluszeitWert">--:--</div>
       <div class="output-info" id="pluszeitInfo">✅ Mehr gearbeitet</div>
     </div>
   </div>
- 
+
   <div class="dark-mode-toggle" onclick="toggleDarkMode()">Dark Mode</div>
 
 </body>
+<script type="text/javascript" src="script.js"></script>
+
 </html>

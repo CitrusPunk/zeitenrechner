@@ -61,3 +61,11 @@ function berechneEndzeiten() {
 function toggleDarkMode() {
     document.body.classList.toggle("dark-mode");
 }
+
+function isDarkMode() {
+    return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+
+if(isDarkMode()){
+        document.body.classList.toggle("dark-mode");
+}
