@@ -35,14 +35,20 @@ function berechneEndzeiten() {
         if (anwesenheit > 360) anwesenheit -= 0;
 
         const soll = 480;
-        const diff = anwesenheit - soll;
+        let diff = anwesenheit - soll;
 
-        if (diff < 0) {
+        if (anwesenheit < 360) { // Mitarbeiter weniger als 6 Stunden anwesend
             const h = Math.floor(Math.abs(diff) / 60);
             const m = Math.abs(diff) % 60;
             fehlWert.textContent = `${h}:${m.toString().padStart(2, '0')} h`;
             fehlBox.style.display = "flex";
-        } else if (diff > 0) {
+        } else if (anwesenheit >= 360 && diff < 0){ // Mitarbeiter mehr als 6 Stunden aber weniger als 8 Stunden anwesend
+            diff = diff - 30
+            const h = Math.floor(Math.abs(diff) / 60);
+            const m = Math.abs(diff) % 60;
+            fehlWert.textContent = `${h}:${m.toString().padStart(2, '0')} h`;
+            fehlBox.style.display = "flex";
+        }else if(diff >= 0) { // Mitarbeiter 8 Stunden oder mehr anwesend
             const h = Math.floor(diff / 60);
             const m = diff % 60;
             plusWert.textContent = `${h}:${m.toString().padStart(2, '0')} h`;
