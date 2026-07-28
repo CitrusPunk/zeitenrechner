@@ -24,297 +24,307 @@
 
 <body>
 
-    <div class="page-container">
+    <div
+        class="scale-stage"
+        id="scaleStage"
+    >
 
-        <h1>Zeitrechner</h1>
-
-        <section
-            class="info-card"
-            aria-labelledby="rechenregelTitel"
+        <div
+            class="page-container"
+            id="pageContainer"
         >
 
-            <div class="info-heading">
+            <h1>Zeitrechner</h1>
 
-                <div
-                    class="info-icon"
-                    aria-hidden="true"
-                >
-                    i
-                </div>
-
-                <h2 id="rechenregelTitel">
-                    So wird gerechnet
-                </h2>
-
-            </div>
-
-            <p>
-                Ab <strong>6:00 h Anwesenheit</strong> werden automatisch
-                <strong>0:30 h Pause</strong> abgezogen.
-            </p>
-
-            <p>
-                Um den Pausenabzug zu vermeiden, musst du spätestens
-                <strong>eine Minute vor der 6-Stunden-Grenze</strong>
-                ausstempeln.
-            </p>
-
-        </section>
-
-        <section class="input-card">
-
-            <div class="time-inputs">
-
-                <div class="input-group">
-
-                    <label for="arbeitsbeginn">
-                        Beginn
-                    </label>
-
-                    <div class="time-field">
-
-                        <svg
-                            class="time-field-icon"
-                            viewBox="0 0 24 24"
-                            aria-hidden="true"
-                        >
-                            <circle
-                                cx="12"
-                                cy="12"
-                                r="8"
-                            ></circle>
-
-                            <path d="M12 7v5l3 2"></path>
-                        </svg>
-
-                        <input
-                            type="time"
-                            id="arbeitsbeginn"
-                            autocomplete="off"
-                        >
-
-                    </div>
-
-                </div>
-
-                <div class="input-group">
-
-                    <label for="arbeitsende">
-                        Ende
-                    </label>
-
-                    <div class="time-field">
-
-                        <svg
-                            class="time-field-icon"
-                            viewBox="0 0 24 24"
-                            aria-hidden="true"
-                        >
-                            <circle
-                                cx="12"
-                                cy="12"
-                                r="8"
-                            ></circle>
-
-                            <path d="M12 7v5l3 2"></path>
-                        </svg>
-
-                        <input
-                            type="time"
-                            id="arbeitsende"
-                            autocomplete="off"
-                        >
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-        <section class="results-card">
-
-            <article class="result-row">
-
-                <div class="result-icon result-icon-normal">
-
-                    <svg
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                    >
-                        <circle
-                            cx="12"
-                            cy="12"
-                            r="8"
-                        ></circle>
-
-                        <path d="M12 7v5l3 2"></path>
-                    </svg>
-
-                </div>
-
-                <div class="result-content">
-
-                    <h3>
-                        Normales Arbeitsende
-                    </h3>
-
-                    <p id="normalEndeInfo">
-                        Ende nach 8:00 h Anwesenheit inklusive
-                        0:30 h Pause
-                    </p>
-
-                </div>
-
-                <div
-                    class="result-time result-time-normal"
-                    id="normalEnde"
-                >
-                    --:--
-                </div>
-
-            </article>
-
-            <article class="result-row">
-
-                <div class="result-icon result-icon-max">
-
-                    <svg
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                    >
-                        <path d="M7 3h10"></path>
-                        <path d="M7 21h10"></path>
-                        <path d="M8 3c0 4 2 5 4 7"></path>
-                        <path d="M16 3c0 4-2 5-4 7"></path>
-                        <path d="M8 21c0-4 2-5 4-7"></path>
-                        <path d="M16 21c0-4-2-5-4-7"></path>
-                    </svg>
-
-                </div>
-
-                <div class="result-content">
-
-                    <h3>
-                        Max. Arbeitsende
-                    </h3>
-
-                    <p id="ueberstundenEndeInfo">
-                        Spätestes Ende bei 9:30 h Anwesenheit –
-                        jedoch nie später als 17:00 Uhr
-                    </p>
-
-                </div>
-
-                <div
-                    class="result-time result-time-max"
-                    id="ueberstundenEnde"
-                >
-                    --:--
-                </div>
-
-            </article>
-
-            <article class="result-row">
-
-                <div class="result-icon result-icon-pause">
-
-                    <svg
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                    >
-                        <path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6l7-3z"></path>
-                        <path d="M8.5 12l2.2 2.2L15.8 9"></path>
-                    </svg>
-
-                </div>
-
-                <div class="result-content">
-
-                    <h3>
-                        Letzter Zeitpunkt ohne Pausenabzug
-                    </h3>
-
-                    <p id="pausefreiEndeInfo">
-                        Spätestens zu diesem Zeitpunkt ausstempeln.
-                        Ab der nächsten Minute werden 0:30 h Pause abgezogen.
-                    </p>
-
-                </div>
-
-                <div
-                    class="result-time result-time-pause"
-                    id="pausefreiEnde"
-                >
-                    --:--
-                </div>
-
-            </article>
-
-            <div
-                class="hinweis-box"
-                id="hinweisBox"
-                role="status"
-                aria-live="polite"
-            ></div>
-
-            <div
-                class="status-card"
-                id="statusBox"
-                role="status"
-                aria-live="polite"
+            <section
+                class="info-card"
+                aria-labelledby="rechenregelTitel"
             >
 
-                <div class="status-icon">
+                <div class="info-heading">
 
-                    <svg
-                        id="statusSymbol"
-                        viewBox="0 0 24 24"
+                    <div
+                        class="info-icon"
                         aria-hidden="true"
                     >
-                        <path d="M7 7l10 10"></path>
-                        <path d="M17 7L7 17"></path>
-                    </svg>
+                        i
+                    </div>
+
+                    <h2 id="rechenregelTitel">
+                        So wird gerechnet
+                    </h2>
 
                 </div>
 
-                <div class="status-content">
+                <p>
+                    Ab <strong>6:00 h Anwesenheit</strong> werden automatisch
+                    <strong>0:30 h Pause</strong> abgezogen.
+                </p>
+
+                <p>
+                    Um den Pausenabzug zu vermeiden, musst du spätestens
+                    <strong>eine Minute vor der 6-Stunden-Grenze</strong>
+                    ausstempeln.
+                </p>
+
+            </section>
+
+            <section class="input-card">
+
+                <div class="time-inputs">
+
+                    <div class="input-group">
+
+                        <label for="arbeitsbeginn">
+                            Beginn
+                        </label>
+
+                        <div class="time-field">
+
+                            <svg
+                                class="time-field-icon"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+                                <circle
+                                    cx="12"
+                                    cy="12"
+                                    r="8"
+                                ></circle>
+
+                                <path d="M12 7v5l3 2"></path>
+                            </svg>
+
+                            <input
+                                type="time"
+                                id="arbeitsbeginn"
+                                autocomplete="off"
+                            >
+
+                        </div>
+
+                    </div>
+
+                    <div class="input-group">
+
+                        <label for="arbeitsende">
+                            Ende
+                        </label>
+
+                        <div class="time-field">
+
+                            <svg
+                                class="time-field-icon"
+                                viewBox="0 0 24 24"
+                                aria-hidden="true"
+                            >
+                                <circle
+                                    cx="12"
+                                    cy="12"
+                                    r="8"
+                                ></circle>
+
+                                <path d="M12 7v5l3 2"></path>
+                            </svg>
+
+                            <input
+                                type="time"
+                                id="arbeitsende"
+                                autocomplete="off"
+                            >
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+            <section class="results-card">
+
+                <article class="result-row">
+
+                    <div class="result-icon result-icon-normal">
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+                            <circle
+                                cx="12"
+                                cy="12"
+                                r="8"
+                            ></circle>
+
+                            <path d="M12 7v5l3 2"></path>
+                        </svg>
+
+                    </div>
+
+                    <div class="result-content">
+
+                        <h3>
+                            Normales Arbeitsende
+                        </h3>
+
+                        <p id="normalEndeInfo">
+                            Ende nach 8:00 h Anwesenheit inklusive
+                            0:30 h Pause
+                        </p>
+
+                    </div>
 
                     <div
-                        class="status-value"
-                        id="statusWert"
+                        class="result-time result-time-normal"
+                        id="normalEnde"
                     >
                         --:--
                     </div>
 
-                    <div
-                        class="status-title"
-                        id="statusInfo"
-                    >
-                        Ergebnis
+                </article>
+
+                <article class="result-row">
+
+                    <div class="result-icon result-icon-max">
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+                            <path d="M7 3h10"></path>
+                            <path d="M7 21h10"></path>
+                            <path d="M8 3c0 4 2 5 4 7"></path>
+                            <path d="M16 3c0 4-2 5-4 7"></path>
+                            <path d="M8 21c0-4 2-5 4-7"></path>
+                            <path d="M16 21c0-4-2-5-4-7"></path>
+                        </svg>
+
+                    </div>
+
+                    <div class="result-content">
+
+                        <h3>
+                            Max. Arbeitsende
+                        </h3>
+
+                        <p id="ueberstundenEndeInfo">
+                            Spätestes Ende bei 9:30 h Anwesenheit –
+                            jedoch nie später als 17:00 Uhr
+                        </p>
+
                     </div>
 
                     <div
-                        class="status-detail"
-                        id="statusDetail"
-                    ></div>
+                        class="result-time result-time-max"
+                        id="ueberstundenEnde"
+                    >
+                        --:--
+                    </div>
+
+                </article>
+
+                <article class="result-row">
+
+                    <div class="result-icon result-icon-pause">
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+                            <path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6l7-3z"></path>
+                            <path d="M8.5 12l2.2 2.2L15.8 9"></path>
+                        </svg>
+
+                    </div>
+
+                    <div class="result-content">
+
+                        <h3>
+                            Letzter Zeitpunkt ohne Pausenabzug
+                        </h3>
+
+                        <p id="pausefreiEndeInfo">
+                            Spätestens zu diesem Zeitpunkt ausstempeln.
+                            Ab der nächsten Minute werden 0:30 h Pause abgezogen.
+                        </p>
+
+                    </div>
+
+                    <div
+                        class="result-time result-time-pause"
+                        id="pausefreiEnde"
+                    >
+                        --:--
+                    </div>
+
+                </article>
+
+                <div
+                    class="hinweis-box"
+                    id="hinweisBox"
+                    role="status"
+                    aria-live="polite"
+                ></div>
+
+                <div
+                    class="status-card"
+                    id="statusBox"
+                    role="status"
+                    aria-live="polite"
+                >
+
+                    <div class="status-icon">
+
+                        <svg
+                            id="statusSymbol"
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+                            <path d="M7 7l10 10"></path>
+                            <path d="M17 7L7 17"></path>
+                        </svg>
+
+                    </div>
+
+                    <div class="status-content">
+
+                        <div
+                            class="status-value"
+                            id="statusWert"
+                        >
+                            --:--
+                        </div>
+
+                        <div
+                            class="status-title"
+                            id="statusInfo"
+                        >
+                            Ergebnis
+                        </div>
+
+                        <div
+                            class="status-detail"
+                            id="statusDetail"
+                        ></div>
+
+                    </div>
 
                 </div>
 
-            </div>
+            </section>
 
-        </section>
+            <button
+                type="button"
+                class="dark-mode-toggle"
+                id="darkModeToggle"
+                onclick="toggleDarkMode()"
+                aria-pressed="false"
+            >
+                ☀️ Light Mode
+            </button>
 
-        <button
-            type="button"
-            class="dark-mode-toggle"
-            id="darkModeToggle"
-            onclick="toggleDarkMode()"
-            aria-pressed="false"
-        >
-            ☀️ Light Mode
-        </button>
+        </div>
 
     </div>
 

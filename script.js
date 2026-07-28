@@ -24,6 +24,223 @@ const STANDARDTEXTE = Object.freeze({
 });
 
 
+let skalierungsFrame = null;
+let groessenBeobachter = null;
+
+
+/*
+ * ---------------------------------------------------------
+ * Automatische Bildschirm-Skalierung
+ * ---------------------------------------------------------
+ */
+
+function istMobileAnsicht() {
+    return window.matchMedia(
+        "(max-width: 700px)"
+    ).matches;
+}
+
+
+function setzeSkalierungZurueck() {
+    const scaleStage =
+        document.getElementById("scaleStage");
+
+    const pageContainer =
+        document.getElementById("pageContainer");
+
+    document.body.classList.remove(
+        "fit-screen-active"
+    );
+
+    pageContainer.style.transform =
+        "none";
+
+    scaleStage.style.height =
+        "auto";
+}
+
+
+function aktualisiereSkalierung() {
+    const scaleStage =
+        document.getElementById("scaleStage");
+
+    const pageContainer =
+        document.getElementById("pageContainer");
+
+    if (!scaleStage || !pageContainer) {
+        return;
+    }
+
+    /*
+     * Auf Handy und kleinen Tablets wird nicht skaliert.
+     * Dort bleibt das responsive Layout mit Scrollen aktiv.
+     */
+    if (istMobileAnsicht()) {
+        setzeSkalierungZurueck();
+        return;
+    }
+
+    document.body.classList.add(
+        "fit-screen-active"
+    );
+
+    /*
+     * Zuerst auf natürliche Größe zurücksetzen,
+     * damit korrekt gemessen werden kann.
+     */
+    pageContainer.style.transform =
+        "none";
+
+    scaleStage.style.height =
+        "auto";
+
+    const bodyStil =
+        window.getComputedStyle(
+            document.body
+        );
+
+    const paddingOben =
+        parseFloat(bodyStil.paddingTop) || 0;
+
+    const paddingUnten =
+        parseFloat(bodyStil.paddingBottom) || 0;
+
+    const paddingLinks =
+        parseFloat(bodyStil.paddingLeft) || 0;
+
+    const paddingRechts =
+        parseFloat(bodyStil.paddingRight) || 0;
+
+    const verfuegbareHoehe =
+        document.documentElement.clientHeight -
+        paddingOben -
+        paddingUnten -
+        4;
+
+    const verfuegbareBreite =
+        document.documentElement.clientWidth -
+        paddingLinks -
+        paddingRechts -
+        4;
+
+    const natuerlicheBreite =
+        pageContainer.offsetWidth;
+
+    const natuerlicheHoehe =
+        pageContainer.scrollHeight;
+
+    if (
+        natuerlicheBreite <= 0 ||
+        natuerlicheHoehe <= 0
+    ) {
+        return;
+    }
+
+    /*
+     * Höhe und Breite werden berücksichtigt.
+     * Es wird nur verkleinert, niemals vergrößert.
+     */
+    const skalierungNachHoehe =
+        verfuegbareHoehe /
+        natuerlicheHoehe;
+
+    const skalierungNachBreite =
+        verfuegbareBreite /
+        natuerlicheBreite;
+
+    const skalierung =
+        Math.min(
+            1,
+            skalierungNachHoehe,
+            skalierungNachBreite
+        );
+
+    pageContainer.style.transform =
+        `scale(${skalierung})`;
+
+    /*
+     * Transform verändert die optische Größe,
+     * aber nicht automatisch die Layout-Höhe.
+     * Deshalb wird die äußere Ebene angepasst.
+     */
+    scaleStage.style.height =
+        `${Math.ceil(
+            natuerlicheHoehe *
+            skalierung
+        )}px`;
+}
+
+
+function planeSkalierung() {
+    if (skalierungsFrame !== null) {
+        cancelAnimationFrame(
+            skalierungsFrame
+        );
+    }
+
+    skalierungsFrame =
+        requestAnimationFrame(
+            function () {
+                aktualisiereSkalierung();
+
+                skalierungsFrame = null;
+            }
+        );
+}
+
+
+function initialisiereAutomatischeSkalierung() {
+    window.addEventListener(
+        "resize",
+        planeSkalierung
+    );
+
+    window.addEventListener(
+        "orientationchange",
+        planeSkalierung
+    );
+
+    /*
+     * Reagiert auch darauf, wenn eine Statuskarte,
+     * Warnung oder Fehlzeit eingeblendet wird.
+     */
+    if ("ResizeObserver" in window) {
+        groessenBeobachter =
+            new ResizeObserver(
+                planeSkalierung
+            );
+
+        groessenBeobachter.observe(
+            document.getElementById(
+                "pageContainer"
+            )
+        );
+    }
+
+    /*
+     * Nach dem vollständigen Laden erneut messen.
+     */
+    window.addEventListener(
+        "load",
+        planeSkalierung
+    );
+
+    if (document.fonts?.ready) {
+        document.fonts.ready.then(
+            planeSkalierung
+        );
+    }
+
+    planeSkalierung();
+}
+
+
+/*
+ * ---------------------------------------------------------
+ * Zeitberechnung
+ * ---------------------------------------------------------
+ */
+
 function zeitInMinuten(zeit) {
     const [stunden, minuten] = zeit
         .split(":")
@@ -34,22 +251,35 @@ function zeitInMinuten(zeit) {
 
 
 function formatiereUhrzeit(gesamtMinuten) {
-    const minutenProTag = 24 * 60;
+    const minutenProTag =
+        24 * 60;
 
     const minutenAmTag =
-        ((gesamtMinuten % minutenProTag) + minutenProTag) %
+        (
+            (
+                gesamtMinuten %
+                minutenProTag
+            ) +
+            minutenProTag
+        ) %
         minutenProTag;
 
     const stunden =
-        Math.floor(minutenAmTag / 60);
+        Math.floor(
+            minutenAmTag / 60
+        );
 
     const minuten =
         minutenAmTag % 60;
 
     return (
-        stunden.toString().padStart(2, "0") +
+        stunden
+            .toString()
+            .padStart(2, "0") +
         ":" +
-        minuten.toString().padStart(2, "0")
+        minuten
+            .toString()
+            .padStart(2, "0")
     );
 }
 
@@ -59,7 +289,9 @@ function formatiereDauer(gesamtMinuten) {
         Math.abs(gesamtMinuten);
 
     const stunden =
-        Math.floor(absoluteMinuten / 60);
+        Math.floor(
+            absoluteMinuten / 60
+        );
 
     const minuten =
         absoluteMinuten % 60;
@@ -67,7 +299,9 @@ function formatiereDauer(gesamtMinuten) {
     return (
         stunden +
         ":" +
-        minuten.toString().padStart(2, "0") +
+        minuten
+            .toString()
+            .padStart(2, "0") +
         " h"
     );
 }
@@ -84,9 +318,14 @@ function berechneNettoArbeitszeit(anwesenheit) {
             : 0;
 
     return {
-        pauseWirdAbgezogen: pauseWirdAbgezogen,
-        pause: pause,
-        nettoArbeitszeit: anwesenheit - pause
+        pauseWirdAbgezogen:
+            pauseWirdAbgezogen,
+
+        pause:
+            pause,
+
+        nettoArbeitszeit:
+            anwesenheit - pause
     };
 }
 
@@ -128,9 +367,12 @@ function setzeAusgabeZurueck() {
 
 function versteckeStatus() {
     const statusBox =
-        document.getElementById("statusBox");
+        document.getElementById(
+            "statusBox"
+        );
 
-    statusBox.style.display = "none";
+    statusBox.style.display =
+        "none";
 
     statusBox.classList.remove(
         "status-minus",
@@ -143,7 +385,9 @@ function versteckeStatus() {
 
 function setzeStatusSymbol(typ) {
     const statusSymbol =
-        document.getElementById("statusSymbol");
+        document.getElementById(
+            "statusSymbol"
+        );
 
     if (typ === "minus") {
         statusSymbol.innerHTML = `
@@ -187,16 +431,24 @@ function zeigeStatus(
     detail
 ) {
     const statusBox =
-        document.getElementById("statusBox");
+        document.getElementById(
+            "statusBox"
+        );
 
     const statusWert =
-        document.getElementById("statusWert");
+        document.getElementById(
+            "statusWert"
+        );
 
     const statusInfo =
-        document.getElementById("statusInfo");
+        document.getElementById(
+            "statusInfo"
+        );
 
     const statusDetail =
-        document.getElementById("statusDetail");
+        document.getElementById(
+            "statusDetail"
+        );
 
     statusBox.classList.remove(
         "status-minus",
@@ -211,38 +463,51 @@ function zeigeStatus(
 
     setzeStatusSymbol(typ);
 
-    statusWert.textContent = wert;
-    statusInfo.textContent = titel;
-    statusDetail.textContent = detail || "";
+    statusWert.textContent =
+        wert;
 
-    statusBox.style.display = "grid";
+    statusInfo.textContent =
+        titel;
+
+    statusDetail.textContent =
+        detail || "";
+
+    statusBox.style.display =
+        "grid";
 }
 
 
 function versteckeHinweis() {
     const hinweisBox =
-        document.getElementById("hinweisBox");
+        document.getElementById(
+            "hinweisBox"
+        );
 
-    hinweisBox.textContent = "";
-    hinweisBox.style.display = "none";
+    hinweisBox.textContent =
+        "";
+
+    hinweisBox.style.display =
+        "none";
 }
 
 
 function zeigeHinweis(text) {
     const hinweisBox =
-        document.getElementById("hinweisBox");
+        document.getElementById(
+            "hinweisBox"
+        );
 
-    hinweisBox.textContent = text;
-    hinweisBox.style.display = "block";
+    hinweisBox.textContent =
+        text;
+
+    hinweisBox.style.display =
+        "block";
 }
 
 
-function zeigeVoraussichtlicheFehlzeit(startMinuten) {
-    /*
-     * Berechnet, wie viel Arbeitszeit vom eingegebenen
-     * Beginn bis zum spätesten Ende um 17:00 Uhr
-     * überhaupt noch möglich ist.
-     */
+function zeigeVoraussichtlicheFehlzeit(
+    startMinuten
+) {
     const anwesenheitBis17Uhr =
         ARBEITSZEIT.SPAETESTES_ENDE_MINUTEN -
         startMinuten;
@@ -256,10 +521,6 @@ function zeigeVoraussichtlicheFehlzeit(startMinuten) {
         berechnung.nettoArbeitszeit -
         ARBEITSZEIT.SOLL_NETTO_MINUTEN;
 
-    /*
-     * Diese Funktion wird nur verwendet, wenn die
-     * Sollzeit bis 17:00 Uhr nicht mehr erreichbar ist.
-     */
     if (differenzBei17Uhr < 0) {
         const pausenText =
             berechnung.pauseWirdAbgezogen
@@ -270,7 +531,9 @@ function zeigeVoraussichtlicheFehlzeit(startMinuten) {
 
         zeigeStatus(
             "minus",
-            formatiereDauer(differenzBei17Uhr),
+            formatiereDauer(
+                differenzBei17Uhr
+            ),
             "✕ Sollzeit nicht erreichbar",
             pausenText
         );
@@ -293,17 +556,11 @@ function berechneEndzeiten() {
     versteckeHinweis();
     setzeStandardtexte();
 
-    /*
-     * Beide Eingabefelder sind leer.
-     */
     if (!beginn && !ende) {
         setzeAusgabeZurueck();
         return;
     }
 
-    /*
-     * Ende ist vorhanden, aber Beginn fehlt.
-     */
     if (!beginn) {
         setzeAusgabeZurueck();
 
@@ -320,9 +577,6 @@ function berechneEndzeiten() {
     const startMinuten =
         zeitInMinuten(beginn);
 
-    /*
-     * Arbeitsbeginn muss vor 17:00 Uhr liegen.
-     */
     if (
         startMinuten >=
         ARBEITSZEIT.SPAETESTES_ENDE_MINUTEN
@@ -341,10 +595,6 @@ function berechneEndzeiten() {
 
     let endMinuten = null;
 
-    /*
-     * Ein eingetragenes Arbeitsende wird geprüft,
-     * bevor Endzeiten angezeigt werden.
-     */
     if (ende) {
         endMinuten =
             zeitInMinuten(ende);
@@ -363,35 +613,19 @@ function berechneEndzeiten() {
         }
     }
 
-    /*
-     * Rechnerisches normales Arbeitsende:
-     * Beginn plus 8:00 Stunden Anwesenheit.
-     */
     const rechnerischesNormalesEnde =
         startMinuten +
         ARBEITSZEIT.NORMALE_ANWESENHEIT_MINUTEN;
 
-    /*
-     * Rechnerischer letzter Zeitpunkt
-     * ohne Pausenabzug.
-     */
     const rechnerischesPausefreiesEnde =
         startMinuten +
         ARBEITSZEIT.PAUSENGRENZE_MINUTEN -
         1;
 
-    /*
-     * Rechnerisches maximales Ende nach
-     * 9:30 Stunden Anwesenheit.
-     */
     const endeNachMaximalerAnwesenheit =
         startMinuten +
         ARBEITSZEIT.MAX_ANWESENHEIT_MINUTEN;
 
-    /*
-     * Keine angezeigte Uhrzeit darf später
-     * als 17:00 Uhr sein.
-     */
     const angezeigtesNormalesEnde =
         Math.min(
             rechnerischesNormalesEnde,
@@ -435,10 +669,6 @@ function berechneEndzeiten() {
         rechnerischesNormalesEnde >
         ARBEITSZEIT.SPAETESTES_ENDE_MINUTEN;
 
-    /*
-     * Die normale Sollzeit wäre erst nach
-     * 17:00 Uhr erreicht.
-     */
     if (sollzeitNichtErreichbar) {
         document.getElementById(
             "normalEndeInfo"
@@ -453,10 +683,6 @@ function berechneEndzeiten() {
         );
     }
 
-    /*
-     * Das maximale Ende wird durch die
-     * feste 17-Uhr-Grenze begrenzt.
-     */
     if (
         endeNachMaximalerAnwesenheit >
         ARBEITSZEIT.SPAETESTES_ENDE_MINUTEN
@@ -467,10 +693,6 @@ function berechneEndzeiten() {
             "Spätestes erlaubtes Arbeitsende ist 17:00 Uhr.";
     }
 
-    /*
-     * Die 6-Stunden-Grenze wird möglicherweise
-     * erst nach 17:00 Uhr erreicht.
-     */
     if (
         rechnerischesPausefreiesEnde >
         ARBEITSZEIT.SPAETESTES_ENDE_MINUTEN
@@ -483,13 +705,6 @@ function berechneEndzeiten() {
             "Es erfolgt daher kein Pausenabzug.";
     }
 
-    /*
-     * Noch kein tatsächliches Arbeitsende eingetragen.
-     *
-     * Wenn die Sollzeit nicht mehr erreichbar ist,
-     * wird automatisch die Fehlzeit bei einem Ende
-     * um 17:00 Uhr angezeigt.
-     */
     if (!ende) {
         if (sollzeitNichtErreichbar) {
             zeigeVoraussichtlicheFehlzeit(
@@ -515,9 +730,6 @@ function berechneEndzeiten() {
 
     const grenzverletzungen = [];
 
-    /*
-     * Arbeitsende nach 17:00 Uhr.
-     */
     if (
         endMinuten >
         ARBEITSZEIT.SPAETESTES_ENDE_MINUTEN
@@ -527,9 +739,6 @@ function berechneEndzeiten() {
         );
     }
 
-    /*
-     * Anwesenheit länger als 9:30 Stunden.
-     */
     if (
         anwesenheit >
         ARBEITSZEIT.MAX_ANWESENHEIT_MINUTEN
@@ -543,7 +752,9 @@ function berechneEndzeiten() {
         const wert =
             differenz === 0
                 ? "0:00 h"
-                : formatiereDauer(differenz);
+                : formatiereDauer(
+                    differenz
+                );
 
         zeigeStatus(
             "warning",
@@ -560,13 +771,12 @@ function berechneEndzeiten() {
             ? "0:30 h Pause abgezogen"
             : "kein Pausenabzug";
 
-    /*
-     * Tatsächliche Fehlzeit
-     */
     if (differenz < 0) {
         zeigeStatus(
             "minus",
-            formatiereDauer(differenz),
+            formatiereDauer(
+                differenz
+            ),
             "✕ Zu wenig gearbeitet",
             pausenText
         );
@@ -574,9 +784,6 @@ function berechneEndzeiten() {
         return;
     }
 
-    /*
-     * Sollzeit genau erreicht
-     */
     if (differenz === 0) {
         zeigeStatus(
             "equal",
@@ -588,17 +795,22 @@ function berechneEndzeiten() {
         return;
     }
 
-    /*
-     * Tatsächliche Pluszeit
-     */
     zeigeStatus(
         "plus",
-        formatiereDauer(differenz),
+        formatiereDauer(
+            differenz
+        ),
         "Mehr gearbeitet",
         pausenText
     );
 }
 
+
+/*
+ * ---------------------------------------------------------
+ * Dark Mode
+ * ---------------------------------------------------------
+ */
 
 function setzeDarkMode(aktiv) {
     const darkModeToggle =
@@ -620,6 +832,8 @@ function setzeDarkMode(aktiv) {
         aktiv
             ? "☀️ Light Mode"
             : "🌙 Dark Mode";
+
+    planeSkalierung();
 }
 
 
@@ -650,6 +864,12 @@ function toggleDarkMode() {
 }
 
 
+/*
+ * ---------------------------------------------------------
+ * Initialisierung
+ * ---------------------------------------------------------
+ */
+
 function initialisiereAutomatischeBerechnung() {
     const beginnFeld =
         document.getElementById(
@@ -661,24 +881,30 @@ function initialisiereAutomatischeBerechnung() {
             "arbeitsende"
         );
 
+    const berechnenUndSkalieren =
+        function () {
+            berechneEndzeiten();
+            planeSkalierung();
+        };
+
     beginnFeld.addEventListener(
         "input",
-        berechneEndzeiten
+        berechnenUndSkalieren
     );
 
     beginnFeld.addEventListener(
         "change",
-        berechneEndzeiten
+        berechnenUndSkalieren
     );
 
     endeFeld.addEventListener(
         "input",
-        berechneEndzeiten
+        berechnenUndSkalieren
     );
 
     endeFeld.addEventListener(
         "change",
-        berechneEndzeiten
+        berechnenUndSkalieren
     );
 }
 
@@ -686,7 +912,8 @@ function initialisiereAutomatischeBerechnung() {
 document.addEventListener(
     "DOMContentLoaded",
     function () {
-        let gespeicherterDarkMode = null;
+        let gespeicherterDarkMode =
+            null;
 
         try {
             gespeicherterDarkMode =
@@ -700,9 +927,13 @@ document.addEventListener(
             );
         }
 
-        if (gespeicherterDarkMode !== null) {
+        if (
+            gespeicherterDarkMode !==
+            null
+        ) {
             setzeDarkMode(
-                gespeicherterDarkMode === "true"
+                gespeicherterDarkMode ===
+                "true"
             );
         } else {
             const systemVerwendetDarkMode =
@@ -729,5 +960,17 @@ document.addEventListener(
         versteckeHinweis();
 
         initialisiereAutomatischeBerechnung();
+        initialisiereAutomatischeSkalierung();
+
+        /*
+         * Zweite Messung nach dem ersten Rendern.
+         */
+        requestAnimationFrame(
+            function () {
+                requestAnimationFrame(
+                    planeSkalierung
+                );
+            }
+        );
     }
 );
